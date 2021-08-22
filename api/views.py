@@ -1,7 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponse
 from django.http import HttpResponse,JsonResponse
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser,FileUploadParser
 from rest_framework import authentication,permissions
 from .models import *
 from .serializers import *
@@ -120,6 +120,8 @@ class UserList(generics.ListAPIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(serializer._errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetails(APIView):
     def get_object(self, pk):
@@ -148,10 +150,16 @@ class UserDetails(APIView):
 
 class TaskList(APIView):
     def get(self,request,format=None):
-        tasks = Task.objects.all()
-        serializer = TaskSerializer(tasks,many=True)
-
-        return Response(serializer.data)
+        user = self.request.user
+        if(user.is_superuser):
+            tasks = Task.objects.all()
+            serializer = TaskSerializer(tasks,many=True)
+            return Response(serializer.data)
+        else:
+            tasks = Task.objects.filter(assignee=user)
+            serializer = TaskSerializer(tasks,many=True)
+            return Response(serializer.data)
+        
 
     def post(self,request,format=None):
         serializer = TaskSerializer(data=request.data)
@@ -188,3 +196,16 @@ class TaskDetails(APIView):
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+class FileUploadView(APIView):
+    parser_classes = [FileUploadParser]
+    #authentication_classes=[authentication.TokenAuthentication]
+    def get(self,request):
+        pass
+    
+    def post(self,request):
+        file_obj = request.data['file']
+        return Response(status=204)
+
+    def put(self,request):
+        file_obj = request.data['file']
+        return Response(status=204)

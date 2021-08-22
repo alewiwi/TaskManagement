@@ -12,7 +12,6 @@ class Task(models.Model):
     assignee = models.ForeignKey('auth.User',on_delete=models.CASCADE,related_name="tasks") 
 
     def __str__(self):
-        attachement = self.attachement_set
         return self.title
 
 class Attachement(models.Model):
