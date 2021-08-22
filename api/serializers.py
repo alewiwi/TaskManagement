@@ -22,7 +22,7 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = '__all__'
        
 class UserSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True) #serializers.PrimaryKeyRelatedField(many=True, queryset=Task.objects.all())
+    tasks = TaskSerializer(read_only=True,many=True) #serializers.PrimaryKeyRelatedField(many=True, queryset=Task.objects.all())
     class Meta:
         model = User
         fields="__all__"
