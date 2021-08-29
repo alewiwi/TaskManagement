@@ -11,12 +11,12 @@ class AttachmentSerializer(serializers.ModelSerializer):
 class TaskUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name']
-
+        fields = '__all__'
 class TaskSerializer(serializers.ModelSerializer):
-    attachments = AttachmentSerializer(many=True)
-    creator = TaskUserSerializer(many=False)
-    assignee = TaskUserSerializer(many=False)
+    attachments = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    creator = TaskUserSerializer(many=False,required=False)
+    #assignee = TaskUserSerializer(many=False,read_only=True)
+    assignee = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     class Meta:
         model = Task
         fields = '__all__'

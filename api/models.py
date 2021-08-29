@@ -9,7 +9,7 @@ class Task(models.Model):
     date = models.DateField()
     done = models.BooleanField(default=False)
     creator = models.ForeignKey('auth.User',on_delete=models.CASCADE,related_name="creator")
-    assignee = models.ForeignKey('auth.User',on_delete=models.CASCADE,related_name="tasks") 
+    assignee = models.ForeignKey('auth.User',on_delete=models.CASCADE,related_name="assignee") 
 
     def __str__(self):
         return self.title

@@ -12,100 +12,6 @@ from rest_framework import status
 from django.http import Http404
 from rest_framework import generics
 
-# Create your views here.
-
-# @api_view(['GET'])
-# def get_tasks_list(request):
-#     if request.method == 'GET':
-#         tasks = Task.objects.all()
-#         serializer = TaskSerializer(tasks,many=True)
-#         return JsonResponse(serializer.data,safe=False)
-#     elif request.method == 'POST':
-#         data = JSONParser().parse(request)
-#         serializer = TaskSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return JsonResponse(serializer.data,status=201,safe=False)
-#         else:
-#             return  JsonResponse(serializer.errors,status=400,safe=False)
-# @api_view(['GET'])
-# def get_task(request,task_id):
-#     task = get_object_or_404(Task,id=task_id)
-#     #task = Task.objects.get(id=task)
-#     serializer = TaskSerializer(task)
-#     return JsonResponse(serializer.data,safe=False)
-
-# @api_view(['POST'])
-# def create_task(request):
-#     serializer = TaskSerializer(creator=request.user,data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#     return JsonResponse(serializer.data,safe=False)
-
-# @api_view(['POST'])
-# def update_task(request,task_id):
-#     task = get_object_or_404(Task,id=task_id)
-#     serializer = TaskSerializer(instance=task,data=request.data)
-
-#     if serializer.is_valid():
-#         serializer.save()
-#     return JsonResponse(serializer.data,safe=False)
-
-# @api_view(['DELETE'])
-# def delete_task(request,task_id):
-#     task = get_object_or_404(Task,id=task_id)
-#     serializer = TaskSerializer(instance=task)
-
-#     if serializer.is_valid():
-#         serializer.delete()
-#     return JsonResponse(serializer.data,safe=False)
-
-# @api_view(['GET'])
-# def get_users_list(request):
-#     if request.method == 'GET':
-#         users = User.objects.all()
-#         serializer = UserSerializer(users,many=True)
-#         return JsonResponse(serializer.data,safe=False)
-#     elif request.method == 'POST':
-#         data = JSONParser().parse(request)
-#         serializer = UserSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return JsonResponse(serializer.data,status=201,safe=False)
-#         else:
-#             return JsonResponse(serializer.errors,status=400,safe=False)
-
-# @api_view(['GET'])
-# def get_user(request,user_id):
-#     user = get_object_or_404(User,id=user_id)
-#     serializer = UserSerializer(user)
-#     print(user)
-#     return JsonResponse(serializer.data,safe=False)
-
-# @api_view(['POST'])
-# def create_user(request):
-#     serializer = UserSerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#     return JsonResponse(serializer.data,safe=False)
-
-# @api_view(['POST'])
-# def update_user(request,user_id):
-#     user = get_object_or_404(User,id=user_id)
-#     serializer = UserSerializer(instance=user,data=request.data)
-
-#     if serializer.is_valid():
-#         serializer.save()
-#     return JsonResponse(serializer.data,safe=False)
-
-# @api_view(['DELETE'])
-# def delete_user(request,user_id):
-#     user = get_object_or_404(User,id=user_id)
-#     serializer = TaskSerializer(instance=user)
-
-#     if serializer.is_valid():
-#         serializer.delete()
-#     return JsonResponse(serializer.data,safe=False)
 class UserList(generics.ListAPIView):
     authentication_classes=[authentication.TokenAuthentication]
     permission_classes=[permissions.IsAdminUser]
@@ -164,12 +70,15 @@ class TaskList(APIView):
 
     def post(self,request,format=None):
         serializer = TaskSerializer(data=request.data)
+        print(serializer)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(creator=self.request.user)
             return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(serializer._errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    # def perform_create(self, serializer):
+    #     serializer.save(owner=self.request.user)
 
 
 class TaskDetails(APIView):
