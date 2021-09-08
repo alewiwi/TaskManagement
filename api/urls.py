@@ -11,4 +11,5 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('login/',obtain_auth_token),
     path('upload/', FileUploadView.as_view()),
+    path('login2/', CustomAuthToken.as_view()),
 ]
